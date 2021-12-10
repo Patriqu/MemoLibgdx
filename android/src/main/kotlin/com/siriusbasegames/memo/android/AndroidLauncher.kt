@@ -11,6 +11,7 @@ class AndroidLauncher : AndroidApplication() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initialize(MemoMain(), AndroidApplicationConfiguration().apply {
+
             useGL30 = true
             useAccelerometer = false
             useCompass = false

@@ -1,13 +1,19 @@
 package com.siriusbasegames.memo
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputProcessor
-import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.math.Vector3
 
-class GameInputProcessor(private val floor: Floor, private val camera: OrthographicCamera) : InputProcessor {
+class GameInputProcessor(private val floor: Floor, private val camera: Camera, private val winLoseHandle : WinLoseHandle,
+                         private val disposer: Disposer) : InputProcessor {
 
     override fun keyDown(keycode: Int): Boolean {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.D)) {
+            floor.enterTheBreakpoint()
+        }
+
         return false
     }
 
@@ -20,20 +26,22 @@ class GameInputProcessor(private val floor: Floor, private val camera: Orthograp
     }
 
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-        if (Gdx.input.justTouched()) {
-            Gdx.app.log("Mouse", "LMB. x=$screenX, y=$screenY")
+        if (Gdx.input.isTouched(0)) {
+            if (!winLoseHandle.isWinOrLose()) {
+                Gdx.app.log("Mouse", "LMB. x=$screenX, y=$screenY")
 
-            val touchPosition = Vector3()
-            touchPosition[screenX.toFloat(), screenY.toFloat()] = 0f
+                val touchPosition = Vector3()
+                touchPosition[screenX.toFloat(), screenY.toFloat()] = 0f
 
-            //val worldPosition = camera.unproject(touchPosition)
-            val worldPosition = touchPosition
-            val x = worldPosition.x.toInt()
-            val y = worldPosition.y.toInt()
+                val worldPosition = camera.unproject(touchPosition)
+                val x = worldPosition.x
+                val y = worldPosition.y
 
-            //floor.selectCard(x, y)
-            //floor.destroyCard(x, y)
-            floor.revealCard(x, y)
+                floor.revealCard(x, y, camera)
+            } else {
+                memoMain?.dispose()
+                memoMain?.create()
+            }
         }
 
         return false

@@ -1,29 +1,41 @@
 package com.siriusbasegames.memo
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Gdx.files
+import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Batch
+import com.badlogic.gdx.utils.Timer
 import kotlin.random.Random
-
 import kotlin.random.nextInt
 
-class Floor(private val batch: Batch) {
+
+class Floor(private val batch: Batch, private val winLoseHandle: WinLoseHandle /*private val camera: Camera*/) {
+    //private val unit = 20F
+
     private val rows = 4
     private val columns = 6
+    private val halfColumns = columns / 2
     private val cells = rows * columns
 
-    private val initX = 60
-    private val initY = 100 /*400*/
-    private val w = 80
-    private val h = 80
-    private val OFFSET = 20
+    private val initX = 0.1F  /*50*/ /*graphics.width/10*/ /*graphics.width/2*/ /*- 300*/ /*60*/
+    private val initY = 3F /*400*/ /*graphics.height/10*/ /*100*/ /*graphics.height/2*/ /*+ 100*/ /*400*/
+    private val w = 0.6F /*80*/  // meters
+    private val h = 0.6F /*80*/
+    private val offset = /*20*/ 0.2F   // in meters
+    private val wPlusOffset = w + offset
 
-    private val CARDS_DIR = "cards/"
+    //private val halfViewportWidth = camera.viewportWidth / 2
+
+    private val assetsDir = "assets/"
+    private val cardsDir = "cards/"
 
     private var nrRevealedCards = 0
+    private var remainingCards = cells
+    private val maxAllowedRevealedCards = 2
 
     // textures
-    private val reverseTexture: Texture = Texture("field.png")
+    private val reverseTexture: Texture = Texture("Field.png")
     private var cardsTextures: MutableList<Texture> = ArrayList()
 
     // grid and cells
@@ -32,10 +44,13 @@ class Floor(private val batch: Batch) {
 
     // cards
     private var cardTypes: MutableList<Map<String, String>>
-    private var cardsRemoved: MutableList<Int> = ArrayList()
 
     // mappings
+    // map each cell in the grid to one card from cardTypes set, can exist two the same card types in the grid
     private var cellCardMapping: MutableList<Int>
+
+    private val reverseDelay = 0.3F
+    private val deleteCardsDelay = 0.3F
 
     init {
         initGrid()
@@ -57,20 +72,21 @@ class Floor(private val batch: Batch) {
         for (i in 0 until rows) {
             for (j in 0 until columns) {
                 memoGrid.add(Tile(x, y, w, h))
-                x += w + OFFSET
+                x += w + offset
             }
             x = initX
-            y += h + OFFSET
+            y -= /*+=*/ h + offset
         }
     }
 
     private fun loadCards() {
-        val files = Gdx.files.local("assets/cards/").list()
+        var cardFiles = files.internal(cardsDir).list()     // Android
+        if (cardFiles.isEmpty()) {
+            cardFiles = files.internal(assetsDir + cardsDir).list()     // Desktop
+        }
 
-        for (file in files) {
-            //Texture("logo.png".toInternalFile(), true)
-
-            cardsTextures.add(Texture(CARDS_DIR + file.name()))
+        for (file in cardFiles) {
+            cardsTextures.add(Texture(cardsDir + file.name()))
 
             cardTypes.add(mapOf("name" to file.nameWithoutExtension(), "revealed" to "false"))
         }
@@ -97,49 +113,98 @@ class Floor(private val batch: Batch) {
         }
     }
 
-    fun draw() {
+    fun draw(camera: Camera) {
         for ((i, cell) in memoGrid.withIndex()) {
-            batch.draw(if (cellsRevealed[i]) cardsTextures[cellCardMapping[i]] else reverseTexture, cell.x.toFloat(),
-                cell.y.toFloat(), cell.w.toFloat(), cell.h.toFloat())
+            if (cellCardMapping[i] != -1) {
+                //var x = cell.x.toFloat() / unit
+                //var y = cell.y.toFloat() / unit
+                //var w = cell.w.toFloat() / camera.viewportWidth /*cell.w.toFloat() / unit*/
+                //var h = cell.h.toFloat() / camera.viewportHeight /*cell.h.toFloat() / unit*/
 
+                batch.draw(if (cellsRevealed[i]) cardsTextures[cellCardMapping[i]] else reverseTexture,
+                    calculateDrawnCellX(cell, camera), cell.y, w, h)
+            }
         }
     }
 
-    fun revealCard(x: Int, y: Int) {
-        val it = memoGrid.listIterator()
-        var i = 0
-        while (it.hasNext()) {
-            val tile = it.next()
-            if (x >= tile.x && x < tile.x + tile.w && y > tile.y && y < tile.y + tile.h) {
-                cellsRevealed[i] = true
-                logTileClicked(tile)
+    fun enterTheBreakpoint() {
+        return
+    }
 
-                ++nrRevealedCards
+    fun revealCard(x: Float, y: Float, camera: Camera) {
+        if (nrRevealedCards < maxAllowedRevealedCards) {
+            val it = memoGrid.listIterator()
+            var i = 0
+            while (it.hasNext()) {
+                val cell = it.next()
 
-                if (isMatchedCards()) {
-                    Gdx.app.log(
-                        "Matched", "Matched revealed cards"
-                    )
+                val actualTileX = calculateDrawnCellX(cell, camera)
 
-                    // todo: destroy matched cards
-                    nrRevealedCards = 0
+                if (x >= actualTileX && x < actualTileX + cell.w && y > cell.y && y < cell.y + cell.h) {
+                    if (!cellsRevealed[i]) {
+                        cellsRevealed[i] = true
+                        logTileClicked(cell)
+
+                        ++nrRevealedCards
+
+                        val indices = ArrayList<Int>()
+                        if (isMatchedCards(indices)) {
+                            matchedCardsHandle(indices)
+                        }
+
+                        reverseCardsStep(indices)
+
+                        //winLoseHandle.checkWinConditions(cellCardMapping)
+                    }
+
+                    break
                 }
 
-                break
+                ++i
             }
-
-            ++i
         }
     }
 
-    private fun isMatchedCards() : Boolean {
-        val indices = ArrayList<Int>()
+    private fun calculateDrawnCellX(cell: Tile, camera: Camera): Float {
+        return cell.x + camera.viewportWidth / 2 - (wPlusOffset * halfColumns)
+    }
 
+    private fun matchedCardsHandle(indices: ArrayList<Int>) {
+        Gdx.app.log("Matched", "Matched revealed cards")
+
+        // destroy matched cards
+        Timer.schedule(object: Timer.Task() {
+            override fun run() {
+                destroyMatchedCards(indices)
+
+                if (remainingCards == 0) {
+                    winLoseHandle.win()
+                }
+            }
+        }, deleteCardsDelay)
+    }
+
+    private fun reverseCardsStep(indices: ArrayList<Int>) {
+        if (nrRevealedCards == maxAllowedRevealedCards) {
+            Timer.schedule(object : Timer.Task() {
+                override fun run() {
+                    reverseAllCards(indices)
+                    nrRevealedCards = 0
+                }
+            }, reverseDelay)
+        }
+    }
+
+    private fun reverseAllCards(indices: ArrayList<Int>) {
+        for (index in indices) {
+            cellsRevealed[index] = false
+        }
+    }
+
+    private fun isMatchedCards(indices: ArrayList<Int>) : Boolean {
         val revealed = cellsRevealed.filterIndexed { index, b -> addRevealedIndex(indices, b, index) }
 
-        //cardsTextures[gridCardMapping[revealed]]
-
-        if (revealed.size == 2) {
+        if (revealed.size == maxAllowedRevealedCards) {
             return cellCardMapping[indices[0]] == cellCardMapping[indices[1]]
         }
 
@@ -153,23 +218,16 @@ class Floor(private val batch: Batch) {
         return false
     }
 
-    fun destroyMatchedCards(firstX: Int, firstY: Int, secondX: Int, secondY: Int) {
-        destroyCard(firstX, firstY)
-        destroyCard(secondX, secondY)
+    private fun destroyMatchedCards(cardIndices: ArrayList<Int>) {
+        for (index in cardIndices) {
+            destroyCard(index)
+        }
+
+        remainingCards -= 2
     }
 
-    fun destroyCard(x: Int, y: Int) {
-        // todo: fix
-        val it = cards.iterator()
-        while (it.hasNext()) {
-            val tile = it.next()
-            if (x >= tile.x && x < tile.x + tile.w && y > tile.y && y < tile.y + tile.h) {
-                //logTileClicked(tile)
-                it.remove()
-
-                break
-            }
-        }
+    private fun destroyCard(cardNr: Int) {
+       cellCardMapping[cardNr] = -1
     }
 
     private fun logTileClicked(tile: Tile) {
@@ -185,9 +243,9 @@ class Floor(private val batch: Batch) {
     }
 
     private class Tile(
-        val x: Int,
-        val y: Int,
-        val w: Int,
-        val h: Int
+        val x: Float,
+        val y: Float,
+        val w: Float,
+        val h: Float
     )
 }

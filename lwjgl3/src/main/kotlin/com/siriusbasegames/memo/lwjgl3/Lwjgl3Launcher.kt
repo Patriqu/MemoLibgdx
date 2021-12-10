@@ -11,7 +11,7 @@ fun main() {
     Lwjgl3Application(MemoMain(), Lwjgl3ApplicationConfiguration().apply {
         setTitle("Memo Libgdx Game - v.0.1")
         setResizable(false)
-        setWindowedMode(800, 600)
+        setWindowedMode(1280, 720)
         setWindowIcon(*(arrayOf(128, 64, 32, 16).map { "libgdx$it.png" }.toTypedArray()))
     })
 }

@@ -49,6 +49,10 @@ dependencies {
 	/*implementation "de.tomgrill.gdxfacebook:gdx-dialogs-core:$dialogsVersion:sources"
 	implementation "de.tomgrill.gdxfacebook:gdx-dialogs-html:$dialogsVersion"
 	implementation "de.tomgrill.gdxfacebook:gdx-dialogs-html:$dialogsVersion:sources"*/
+
+	implementation "com.github.intrigus.gdx-freetype-gwt:gdx-freetype-gwt:1.9.10.1"
+	implementation "com.github.intrigus.gdx-freetype-gwt:gdx-freetype-gwt:1.9.10.1:sources"
+
 	implementation project(':core')
 
 //// You can use the lines below instead of the "com.badlogicgames.gdx:gdx-backend-gwt" dependencies.
