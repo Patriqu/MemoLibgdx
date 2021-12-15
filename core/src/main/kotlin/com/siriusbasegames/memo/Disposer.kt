@@ -3,11 +3,11 @@ package com.siriusbasegames.memo
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import ktx.assets.disposeSafely
 
-class Disposer(private val batch: SpriteBatch, private val floor: Floor, private val winLoseHandle : WinLoseHandle) {
+class Disposer(private val batch: SpriteBatch, private val gridController: GridController, private val guiDrawer : GuiDrawer?) {
 
     fun dispose() {
         batch.disposeSafely()
-        floor.dispose()
-        winLoseHandle.dispose()
+        gridController.dispose()
+        guiDrawer?.dispose()
     }
 }

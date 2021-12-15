@@ -6,15 +6,31 @@ import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.math.Vector3
 
-class GameInputProcessor(private val floor: Floor, private val camera: Camera, private val winLoseHandle : WinLoseHandle,
-                         private val disposer: Disposer) : InputProcessor {
+class GameInputProcessor(private val gridController: GridController, private val camera: Camera, private val gameStateHandler:
+    GameStateHandler) : InputProcessor {
 
     override fun keyDown(keycode: Int): Boolean {
-        if (Gdx.input.isKeyJustPressed(Input.Keys.D)) {
-            floor.enterTheBreakpoint()
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
+            val actualState = gameStateHandler.getState()
+            if (actualState == GameState.LEVEL_COMPLETE) {
+                gameStateHandler.setState(GameState.NEXT_LEVEL)
+            } else if (actualState == GameState.LOSE || actualState == GameState.WIN) {
+                gameStateHandler.setState(GameState.RESET)
+            }
         }
 
+        debugKeys()
+
         return false
+    }
+
+    private fun debugKeys() {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.D)) {
+            gridController.enterTheBreakpoint()
+        }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_0)) {
+            gameStateHandler.setState(GameState.LEVEL_COMPLETE)
+        }
     }
 
     override fun keyUp(keycode: Int): Boolean {
@@ -27,7 +43,8 @@ class GameInputProcessor(private val floor: Floor, private val camera: Camera, p
 
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
         if (Gdx.input.isTouched(0)) {
-            if (!winLoseHandle.isWinOrLose()) {
+            val actualState = gameStateHandler.getState()
+            if (actualState == GameState.RUNNING) {
                 Gdx.app.log("Mouse", "LMB. x=$screenX, y=$screenY")
 
                 val touchPosition = Vector3()
@@ -37,10 +54,11 @@ class GameInputProcessor(private val floor: Floor, private val camera: Camera, p
                 val x = worldPosition.x
                 val y = worldPosition.y
 
-                floor.revealCard(x, y, camera)
-            } else {
-                memoMain?.dispose()
-                memoMain?.create()
+                gridController.revealCard(x, y, camera)
+            } else if (actualState == GameState.LEVEL_COMPLETE) {
+                gameStateHandler.setState(GameState.NEXT_LEVEL)
+            } else if (actualState == GameState.LOSE || actualState == GameState.WIN) {
+                gameStateHandler.setState(GameState.RESET)
             }
         }
 
@@ -48,7 +66,6 @@ class GameInputProcessor(private val floor: Floor, private val camera: Camera, p
     }
 
     override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-
         return false
     }
 

@@ -6,77 +6,49 @@ import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.utils.Timer
-import kotlin.random.Random
-import kotlin.random.nextInt
+import ktx.assets.toInternalFile
 
-
-class Floor(private val batch: Batch, private val winLoseHandle: WinLoseHandle /*private val camera: Camera*/) {
-    //private val unit = 20F
-
-    private val rows = 4
-    private val columns = 6
-    private val halfColumns = columns / 2
-    private val cells = rows * columns
-
-    private val initX = 0.1F  /*50*/ /*graphics.width/10*/ /*graphics.width/2*/ /*- 300*/ /*60*/
-    private val initY = 3F /*400*/ /*graphics.height/10*/ /*100*/ /*graphics.height/2*/ /*+ 100*/ /*400*/
-    private val w = 0.6F /*80*/  // meters
-    private val h = 0.6F /*80*/
-    private val offset = /*20*/ 0.2F   // in meters
-    private val wPlusOffset = w + offset
-
-    //private val halfViewportWidth = camera.viewportWidth / 2
-
+class GridController(private val batch: Batch, private val gameStateHandler: GameStateHandler) {
     private val assetsDir = "assets/"
     private val cardsDir = "cards/"
 
     private var nrRevealedCards = 0
-    private var remainingCards = cells
+    private var remainingCards = 0
     private val maxAllowedRevealedCards = 2
 
     // textures
-    private val reverseTexture: Texture = Texture("Field.png")
+    private val reverseTexture: Texture = Texture("Reverse.png".toInternalFile())
+        .apply { setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear) }
     private var cardsTextures: MutableList<Texture> = ArrayList()
 
     // grid and cells
-    private var memoGrid: MutableList<Tile> = ArrayList()
+    private val grids: Grids = Grids()
+    private var memoGrid: List<Grids.Tile> = mutableListOf()
     private var cellsRevealed: MutableList<Boolean>
 
     // cards
-    private var cardTypes: MutableList<Map<String, String>>
+    private var cardTypes: MutableList<Map<String, String>> = mutableListOf()
 
     // mappings
     // map each cell in the grid to one card from cardTypes set, can exist two the same card types in the grid
     private var cellCardMapping: MutableList<Int>
 
+    // delays
     private val reverseDelay = 0.3F
     private val deleteCardsDelay = 0.3F
 
     init {
-        initGrid()
-
-        cardTypes = ArrayList()
         loadCards()
 
-        cellCardMapping = MutableList(24) { index -> index }
-        cellCardMapping.fill(-1)
+        memoGrid = grids.gridCoordinates(1)
 
-        cellsRevealed = MutableList(24) { false }
-
-        randomizeCardsPlacement()
+        cellCardMapping = grids.randomizeCardsOnGrid(1, cardTypes)
+        cellsRevealed = MutableList(grids.cellsAmount(1)!!) { false }
+        remainingCards = grids.cellsAmount(1)!!
     }
 
-    private fun initGrid() {
-        var x = initX
-        var y = initY
-        for (i in 0 until rows) {
-            for (j in 0 until columns) {
-                memoGrid.add(Tile(x, y, w, h))
-                x += w + offset
-            }
-            x = initX
-            y -= /*+=*/ h + offset
-        }
+    fun enterTheBreakpoint() {
+        return
     }
 
     private fun loadCards() {
@@ -92,43 +64,16 @@ class Floor(private val batch: Batch, private val winLoseHandle: WinLoseHandle /
         }
     }
 
-    private fun randomizeCardsPlacement() {
-        val cellsRange = 0 until cells
-        val availableCells = cellsRange.toMutableList()
-
-        for ((i, card) in cardTypes.withIndex()) {
-            var j = 0
-            while (j < 2) {
-                var cellNr = -1
-                while (cellNr !in availableCells) {
-                    cellNr = Random.nextInt(cellsRange)
-                }
-
-                cellCardMapping[cellNr] = i
-
-                availableCells.remove(cellNr)
-                ++j
-            }
-
-        }
-    }
-
     fun draw(camera: Camera) {
-        for ((i, cell) in memoGrid.withIndex()) {
-            if (cellCardMapping[i] != -1) {
-                //var x = cell.x.toFloat() / unit
-                //var y = cell.y.toFloat() / unit
-                //var w = cell.w.toFloat() / camera.viewportWidth /*cell.w.toFloat() / unit*/
-                //var h = cell.h.toFloat() / camera.viewportHeight /*cell.h.toFloat() / unit*/
-
-                batch.draw(if (cellsRevealed[i]) cardsTextures[cellCardMapping[i]] else reverseTexture,
-                    calculateDrawnCellX(cell, camera), cell.y, w, h)
+        if (cellCardMapping.isNotEmpty())
+        {
+            for ((i, cell) in memoGrid.withIndex()) {
+                if (cellCardMapping[i] != -1) {
+                    batch.draw(if (cellsRevealed[i]) cardsTextures[cellCardMapping[i]] else reverseTexture,
+                        calculateDrawnCellX(cell, camera), cell.y, cell.w, cell.h)
+                }
             }
         }
-    }
-
-    fun enterTheBreakpoint() {
-        return
     }
 
     fun revealCard(x: Float, y: Float, camera: Camera) {
@@ -153,8 +98,6 @@ class Floor(private val batch: Batch, private val winLoseHandle: WinLoseHandle /
                         }
 
                         reverseCardsStep(indices)
-
-                        //winLoseHandle.checkWinConditions(cellCardMapping)
                     }
 
                     break
@@ -165,8 +108,9 @@ class Floor(private val batch: Batch, private val winLoseHandle: WinLoseHandle /
         }
     }
 
-    private fun calculateDrawnCellX(cell: Tile, camera: Camera): Float {
-        return cell.x + camera.viewportWidth / 2 - (wPlusOffset * halfColumns)
+    private fun calculateDrawnCellX(cell: Grids.Tile, camera: Camera): Float {
+        return cell.x + camera.viewportWidth / 2 - (grids.widthWithOffset() * grids.gridLayout(
+            gameStateHandler.currentLevel())["columns"]!! /2)
     }
 
     private fun matchedCardsHandle(indices: ArrayList<Int>) {
@@ -178,7 +122,7 @@ class Floor(private val batch: Batch, private val winLoseHandle: WinLoseHandle /
                 destroyMatchedCards(indices)
 
                 if (remainingCards == 0) {
-                    winLoseHandle.win()
+                    gameStateHandler.setWinState()
                 }
             }
         }, deleteCardsDelay)
@@ -188,14 +132,14 @@ class Floor(private val batch: Batch, private val winLoseHandle: WinLoseHandle /
         if (nrRevealedCards == maxAllowedRevealedCards) {
             Timer.schedule(object : Timer.Task() {
                 override fun run() {
-                    reverseAllCards(indices)
+                    reverseCards(indices)
                     nrRevealedCards = 0
                 }
             }, reverseDelay)
         }
     }
 
-    private fun reverseAllCards(indices: ArrayList<Int>) {
+    private fun reverseCards(indices: ArrayList<Int>) {
         for (index in indices) {
             cellsRevealed[index] = false
         }
@@ -230,22 +174,28 @@ class Floor(private val batch: Batch, private val winLoseHandle: WinLoseHandle /
        cellCardMapping[cardNr] = -1
     }
 
-    private fun logTileClicked(tile: Tile) {
+    private fun logTileClicked(tile: Grids.Tile) {
         Gdx.app.log(
             "Tile", "x=" + tile.x + ", y=" + tile.y + ", x+w=" + (tile.x + tile.w) + ", " +
                     "y+h=" + (tile.y + tile.h)
         )
     }
 
+    fun resetBoard() {
+        remainingCards = grids.cellsAmount(gameStateHandler.currentLevel())!!
+
+        memoGrid = grids.gridCoordinates(gameStateHandler.currentLevel())
+        reverseAllCards()
+        cellCardMapping = grids.randomizeCardsOnGrid(gameStateHandler.currentLevel(), cardTypes)
+    }
+
+    private fun reverseAllCards() {
+        cellsRevealed.let {false}
+        cellsRevealed = MutableList(grids.cellsAmount(gameStateHandler.currentLevel())!!) { false }
+    }
+
     fun dispose() {
         reverseTexture.dispose()
         cardsTextures.forEach { it.dispose() }
     }
-
-    private class Tile(
-        val x: Float,
-        val y: Float,
-        val w: Float,
-        val h: Float
-    )
 }
