@@ -8,10 +8,10 @@ class Grids {
     private var gridCoordinates: MutableList<List<Tile>> = mutableListOf()
 
     private val initX = 0.1F
-    private val initY = 3F
+    private val initY = 2.9F
 
-    private val w = 0.6F    // in meters
-    private val h = 0.6F
+    private val w = 0.7F    // in meters
+    private val h = 0.7F
     private val offset = 0.2F
 
     private val sumWidthOffset = w + offset
