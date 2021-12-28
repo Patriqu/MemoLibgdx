@@ -45,7 +45,7 @@ class GameInputProcessor(private val gridController: GridController, private val
         if (Gdx.input.isTouched(0)) {
             val actualState = gameStateHandler.getState()
             if (actualState == GameState.RUNNING) {
-                Gdx.app.log("Mouse", "LMB. x=$screenX, y=$screenY")
+                Gdx.app.log("Mouse", "LMB x=$screenX, y=$screenY")
 
                 val touchPosition = Vector3()
                 touchPosition[screenX.toFloat(), screenY.toFloat()] = 0f

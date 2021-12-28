@@ -50,8 +50,8 @@ dependencies {
 	implementation "de.tomgrill.gdxfacebook:gdx-dialogs-html:$dialogsVersion"
 	implementation "de.tomgrill.gdxfacebook:gdx-dialogs-html:$dialogsVersion:sources"*/
 
-	implementation "com.github.intrigus.gdx-freetype-gwt:gdx-freetype-gwt:1.9.10.1"
-	implementation "com.github.intrigus.gdx-freetype-gwt:gdx-freetype-gwt:1.9.10.1:sources"
+	implementation "com.github.intrigus.gdx-freetype-gwt:gdx-freetype-gwt:$gwtFreetypeVersion"
+	implementation "com.github.intrigus.gdx-freetype-gwt:gdx-freetype-gwt:$gwtFreetypeVersion:sources"
 
 	implementation project(':core')
 

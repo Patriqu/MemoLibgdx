@@ -61,6 +61,9 @@ class Grids {
     fun widthWithOffset(): Float {
         return sumWidthOffset
     }
+    fun heightWithOffset(): Float {
+        return sumHeightOffset
+    }
 
     fun randomizeCardsOnGrid(level: Int, cardTypes: MutableList<Map<String, String>>): MutableList<Int> {
         val cellCardMapping: MutableList<Int> = MutableList(cellsAmount(level)!!) { -1 }

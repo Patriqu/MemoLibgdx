@@ -24,7 +24,7 @@ class MemoMain : KtxGame<KtxScreen>() {
         removeScreen<MainScreen>()
     }
 }
-class MainScreen(private var gameStateHandler: GameStateHandler) : KtxScreen {
+class MainScreen(gameStateHandler: GameStateHandler) : KtxScreen {
     private val virtualHeight = 4F  // meters
 
     private val batch = SpriteBatch()
@@ -36,7 +36,9 @@ class MainScreen(private var gameStateHandler: GameStateHandler) : KtxScreen {
 
     private val disposer: Disposer
 
-    private var guiDrawer: GuiDrawer = GuiDrawer(gameStateHandler)
+    private val guiDrawer: GuiDrawer = GuiDrawer(gameStateHandler)
+
+    private val updater: Updater
 
     init {
         uiCamera.setToOrtho(false)
@@ -46,10 +48,12 @@ class MainScreen(private var gameStateHandler: GameStateHandler) : KtxScreen {
         disposer = Disposer(batch, gridController, guiDrawer)
 
         input.inputProcessor = GameInputProcessor(gridController, topdownCamera, gameStateHandler)
+
+        updater = Updater(gameStateHandler, guiDrawer, gridController)
     }
 
     override fun render(delta: Float) {
-        updateLogic()
+        updater.update()
 
         Gdx.gl.glClearColor(1f, 1f, 0f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
@@ -66,39 +70,6 @@ class MainScreen(private var gameStateHandler: GameStateHandler) : KtxScreen {
         guiDrawer.draw(batch)
 
         batch.end()
-    }
-
-    private fun updateLogic() {
-        // game state handling
-        when(gameStateHandler.getState()) {
-            GameState.STARTED -> {
-                gameStateHandler.runGame()
-            }
-
-            GameState.RUNNING -> {}
-
-            GameState.LOSE -> {}
-
-            GameState.LEVEL_COMPLETE -> {
-                guiDrawer.win()
-            }
-
-            GameState.NEXT_LEVEL -> {
-                guiDrawer.reset()
-                gameStateHandler.nextLevel()
-                gridController.resetBoard()
-            }
-
-            GameState.WIN -> {
-                guiDrawer.win()
-            }
-
-            GameState.RESET -> {
-                guiDrawer.reset()
-                gameStateHandler.resetGame()
-                gridController.resetBoard()
-            }
-        }
     }
 
     override fun resize(width: Int, height: Int) {

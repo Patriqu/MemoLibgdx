@@ -57,6 +57,8 @@ class GridController(private val batch: Batch, private val gameStateHandler: Gam
             cardFiles = files.internal(assetsDir + cardsDir).list()     // Desktop
         }
 
+        cardFiles = cardFiles.filter { !it.isDirectory }.toTypedArray()
+
         for (file in cardFiles) {
             cardsTextures.add(Texture(cardsDir + file.name()))
 
@@ -70,7 +72,7 @@ class GridController(private val batch: Batch, private val gameStateHandler: Gam
             for ((i, cell) in memoGrid.withIndex()) {
                 if (cellCardMapping[i] != -1) {
                     batch.draw(if (cellsRevealed[i]) cardsTextures[cellCardMapping[i]] else reverseTexture,
-                        calculateDrawnCellX(cell, camera), cell.y, cell.w, cell.h)
+                        calculateDrawnCellX(cell, camera), calculateDrawnCellY(cell, camera), cell.w, cell.h)
                 }
             }
         }
@@ -109,8 +111,11 @@ class GridController(private val batch: Batch, private val gameStateHandler: Gam
     }
 
     private fun calculateDrawnCellX(cell: Grids.Tile, camera: Camera): Float {
-        return cell.x + camera.viewportWidth / 2 - (grids.widthWithOffset() * grids.gridLayout(
-            gameStateHandler.currentLevel())["columns"]!! /2)
+        return cell.x + camera.viewportWidth / 2 -
+                (grids.widthWithOffset() * grids.gridLayout(gameStateHandler.currentLevel())["columns"]!! /2)
+    }
+    private fun calculateDrawnCellY(cell: Grids.Tile, camera: Camera): Float {
+        return cell.y - (camera.viewportHeight/2 - grids.heightWithOffset()*2 - 0.2F)
     }
 
     private fun matchedCardsHandle(indices: ArrayList<Int>) {
@@ -123,6 +128,7 @@ class GridController(private val batch: Batch, private val gameStateHandler: Gam
 
                 if (remainingCards == 0) {
                     gameStateHandler.setWinState()
+
                 }
             }
         }, deleteCardsDelay)
