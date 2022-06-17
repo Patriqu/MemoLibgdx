@@ -64,7 +64,6 @@ class MainScreen(gameStateHandler: GameStateHandler) : KtxScreen {
         console = GUIConsole()
         console.setCommandExecutor(ConsoleCommandsExecutor(gameStateHandler))
         console.displayKeyID = Input.Keys.Q
-        //console.resetInputProcessing()
     }
 
     override fun render(delta: Float) {

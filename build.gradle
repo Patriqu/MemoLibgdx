@@ -38,7 +38,7 @@ configure(subprojects - project(':android')) {
 }
 
 subprojects {
-	version = '0.2.3'
+	version = '0.2.3.1'
 	ext.appName = 'MemoLibgdx'
 	repositories {
 		mavenCentral()
