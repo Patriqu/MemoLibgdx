@@ -2,9 +2,12 @@ package com.siriusbasegames.memo
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Gdx.input
+import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.strongjoshua.console.Console
+import com.strongjoshua.console.GUIConsole
 import ktx.app.KtxGame
 import ktx.app.KtxScreen
 import ktx.async.KtxAsync
@@ -24,6 +27,7 @@ class MemoMain : KtxGame<KtxScreen>() {
         removeScreen<MainScreen>()
     }
 }
+
 class MainScreen(gameStateHandler: GameStateHandler) : KtxScreen {
     private val virtualHeight = 4F  // meters
 
@@ -40,6 +44,8 @@ class MainScreen(gameStateHandler: GameStateHandler) : KtxScreen {
 
     private val updater: Updater
 
+    private lateinit var console: Console
+
     init {
         uiCamera.setToOrtho(false)
 
@@ -50,6 +56,15 @@ class MainScreen(gameStateHandler: GameStateHandler) : KtxScreen {
         input.inputProcessor = GameInputProcessor(gridController, topdownCamera, gameStateHandler)
 
         updater = Updater(gameStateHandler, guiDrawer, gridController)
+
+        initConsole(gameStateHandler)
+    }
+
+    private fun initConsole(gameStateHandler: GameStateHandler) {
+        console = GUIConsole()
+        console.setCommandExecutor(ConsoleCommandsExecutor(gameStateHandler))
+        console.displayKeyID = Input.Keys.Q
+        //console.resetInputProcessing()
     }
 
     override fun render(delta: Float) {
@@ -70,6 +85,8 @@ class MainScreen(gameStateHandler: GameStateHandler) : KtxScreen {
         guiDrawer.draw(batch)
 
         batch.end()
+
+        console.draw()
     }
 
     override fun resize(width: Int, height: Int) {
@@ -78,6 +95,7 @@ class MainScreen(gameStateHandler: GameStateHandler) : KtxScreen {
 
     override fun dispose() {
         disposer.dispose()
+        console.dispose()
     }
 }
 

@@ -45,8 +45,8 @@ class GuiDrawer(gameStateHandler: GameStateHandler) {
 
     // countdown text
     private var countdownFont: BitmapFont? = null
-    private var countdownTextX = 50F /*camera.viewportWidth * 0.05F*/
-    private var countdownTextY = graphics.height - 20F /*camera.viewportHeight - (camera.viewportHeight * 0.05F)*//*570F*/
+    private var countdownTextX = 50F
+    private var countdownTextY = graphics.height - 20F
 
     private val countdownMax = 80
     private var countdown = countdownMax
@@ -112,11 +112,14 @@ class GuiDrawer(gameStateHandler: GameStateHandler) {
     }
 
     private fun scheduleCountdown(): Timer.Task {
-        return Timer.schedule(object: Timer.Task() {
-            override fun run() { countdown--; if (countdown == 0) {
-                this.cancel()
-                gameStateHandler.setState(GameState.LOSE)
-            } }
+        return Timer.schedule(object : Timer.Task() {
+            override fun run() {
+                countdown--
+                if (countdown == 0) {
+                    this.cancel()
+                    gameStateHandler.setState(GameState.LOSE)
+                }
+            }
         }, 1F, 1F)
     }
 
@@ -131,6 +134,9 @@ class GuiDrawer(gameStateHandler: GameStateHandler) {
     }
 
     private fun resetCountdown() {
+        if (countdownTask.isScheduled) {
+            countdownTask.cancel()
+        }
         countdown = countdownMax
         countdownTask = scheduleCountdown()
     }

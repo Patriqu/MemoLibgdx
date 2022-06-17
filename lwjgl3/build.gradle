@@ -1,9 +1,10 @@
 apply plugin: 'application'
 
-sourceSets.main.resources.srcDirs += [ rootProject.file('assets').path ]
+sourceSets.main.resources.srcDirs += [rootProject.file('assets').path]
 mainClassName = 'com.siriusbasegames.memo.lwjgl3.Lwjgl3Launcher'
 eclipse.project.name = appName + '-lwjgl3'
-sourceCompatibility = 15
+sourceCompatibility = JavaVersion.VERSION_15
+java.targetCompatibility = JavaVersion.VERSION_15
 
 dependencies {
 	implementation "com.badlogicgames.gdx-controllers:gdx-controllers-desktop:$gdxControllersVersion"

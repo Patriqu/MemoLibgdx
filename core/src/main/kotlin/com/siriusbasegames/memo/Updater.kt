@@ -23,6 +23,7 @@ class Updater(private val gameStateHandler: GameStateHandler, private val guiDra
                 guiDrawer.reset()
                 gameStateHandler.nextLevel()
                 gridController.resetBoard()
+                gameStateHandler.setState(GameState.RUNNING)
             }
 
             GameState.WIN -> {

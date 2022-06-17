@@ -9,13 +9,23 @@ class GameStateHandler {
     fun currentLevel(): Int {
         return currentLevel
     }
+
     fun nextLevel() {
-        if (currentLevel < maxLevels) {
+        if (currentLevel <= 0) {
+            currentLevel = 1
+        } else if (currentLevel < maxLevels) {
             ++currentLevel
         } else {
             currentLevel = 1
         }
-        actualState = GameState.RUNNING
+    }
+
+    fun setLevel(level: Int) {
+        currentLevel = if (level > maxLevels) {
+            maxLevels
+        } else {
+            level
+        }
     }
 
     fun runGame() {
@@ -42,8 +52,6 @@ class GameStateHandler {
     fun setState(state: GameState) {
         actualState = state
     }
-
-
 }
 
 enum class GameState {
