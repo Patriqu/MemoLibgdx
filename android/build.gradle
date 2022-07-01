@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 
 android {
-	compileSdkVersion 32
+	compileSdkVersion 33
 	sourceSets {
 		main {
 			manifest.srcFile 'AndroidManifest.xml'
@@ -32,24 +32,24 @@ android {
 	defaultConfig {
 		applicationId 'com.siriusbasegames.memo'
 		minSdkVersion 24
-		targetSdkVersion 32
+		targetSdkVersion 33
 		versionCode 1
 		versionName "1.0"
 		multiDexEnabled true
 	}
 	compileOptions {
-		sourceCompatibility "15"
-		targetCompatibility "15"
+		sourceCompatibility "17"
+		targetCompatibility "17"
 		coreLibraryDesugaringEnabled true
 	}
-	kotlinOptions.jvmTarget = "15"
+	kotlinOptions.jvmTarget = "17"
 	buildTypes {
 		release {
 			minifyEnabled false
 			proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 		}
 	}
-	buildToolsVersion '32.0.0'
+	buildToolsVersion '33.0.0'
 	ndkVersion '23.1.7779620'
 
 }

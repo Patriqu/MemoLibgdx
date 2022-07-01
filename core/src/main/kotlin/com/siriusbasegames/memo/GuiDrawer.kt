@@ -22,8 +22,9 @@ class GuiDrawer(gameStateHandler: GameStateHandler) {
     private var completeTexts: MutableMap<String, MutableMap<String, String>>
             = mutableMapOf(
         "levelComplete" to mutableMapOf("primary" to "LEVEL COMPLETE!", "secondary" to "Click to go to the next level"),
-        "win" to mutableMapOf("primary" to "YOU WIN!", "secondary" to "Click to start the game again"),
-        "lose" to mutableMapOf("primary" to "YOU LOSE!", "secondary" to "Click to restart the game"))
+        "win" to mutableMapOf("primary" to "YOU WIN!", "secondary" to "Click to restart the game"),
+        "lose" to mutableMapOf("primary" to "YOU LOSE!", "secondary" to "Click to restart the game")
+    )
     private var completeCoordinates: MutableMap<String, MutableMap<String, MutableMap<String, Float>>>
             = mutableMapOf(
         "levelComplete" to mutableMapOf("X" to mutableMapOf("primary" to 0F, "secondary" to 0F),

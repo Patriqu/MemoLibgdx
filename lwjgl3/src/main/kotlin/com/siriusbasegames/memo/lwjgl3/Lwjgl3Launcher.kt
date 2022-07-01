@@ -9,7 +9,7 @@ import com.siriusbasegames.memo.MemoMain
 /** Launches the desktop (LWJGL3) application. */
 fun main() {
     Lwjgl3Application(MemoMain(), Lwjgl3ApplicationConfiguration().apply {
-        setTitle("Memo Libgdx Game - v.0.2.3.1")
+        setTitle("MEMO LibGDX 0.2.3.2")
         setResizable(false)
         setWindowedMode(1280, 720)
         setWindowIcon(*(arrayOf(128, 64, 32, 16).map { "libgdx$it.png" }.toTypedArray()))

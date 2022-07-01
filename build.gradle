@@ -31,14 +31,14 @@ allprojects {
 configure(subprojects - project(':android')) {
 	apply plugin: 'java-library'
 	apply plugin: 'kotlin'
-	sourceCompatibility = 15
+	sourceCompatibility = 17
 	compileJava {
 		options.incremental = true
 	}
 }
 
 subprojects {
-	version = '0.2.3.1'
+	version = '0.2.3.2'
 	ext.appName = 'MemoLibgdx'
 	repositories {
 		mavenCentral()
