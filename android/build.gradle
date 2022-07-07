@@ -38,11 +38,15 @@ android {
 		multiDexEnabled true
 	}
 	compileOptions {
-		sourceCompatibility "17"
-		targetCompatibility "17"
+		sourceCompatibility JavaVersion.VERSION_17
+		targetCompatibility JavaVersion.VERSION_17
 		coreLibraryDesugaringEnabled true
 	}
-	kotlinOptions.jvmTarget = "17"
+	kotlinOptions {
+		jvmTarget = "$jvmTargetVersion"
+		languageVersion = "$kotlinLanguageVersion"
+		freeCompilerArgs = ["-Xuse-k2", "-Xallow-unstable-dependencies"]
+	}
 	buildTypes {
 		release {
 			minifyEnabled false
@@ -62,7 +66,7 @@ repositories {
 configurations { natives }
 
 dependencies {
-	coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
+	coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:$androidDesugarLib"
 	implementation "com.badlogicgames.gdx-controllers:gdx-controllers-android:$gdxControllersVersion"
 	implementation "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
 	implementation "com.github.MrStahlfelge.gdx-websockets:common:$websocketVersion"

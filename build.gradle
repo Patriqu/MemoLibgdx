@@ -14,8 +14,8 @@ buildscript {
 		constraints {
 			classpath("org.apache.logging.log4j:log4j-core") {
 				version {
-					strictly("[2.16, 3[")
-					prefer("2.16.0")
+					strictly("[2.18, 3[")
+					prefer("2.18.0")
 				}
 				because("CVE-2021-44228: Log4j vulnerable to remote code execution")
 			}
@@ -31,14 +31,22 @@ allprojects {
 configure(subprojects - project(':android')) {
 	apply plugin: 'java-library'
 	apply plugin: 'kotlin'
-	sourceCompatibility = 17
+	sourceCompatibility = JavaVersion.VERSION_17
+
 	compileJava {
 		options.incremental = true
+	}
+	compileKotlin {
+		kotlinOptions {
+			jvmTarget = "$jvmTargetVersion"
+			languageVersion = "$kotlinLanguageVersion"
+			freeCompilerArgs = ["-Xuse-k2", "-Xallow-unstable-dependencies"]
+		}
 	}
 }
 
 subprojects {
-	version = '0.2.3.2'
+	version = '$appVersion'
 	ext.appName = 'MemoLibgdx'
 	repositories {
 		mavenCentral()

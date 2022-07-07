@@ -10,7 +10,7 @@ dependencies {
 	api "com.badlogicgames.gdx:gdx-bullet:$gdxVersion"
 	api "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
 	api "com.badlogicgames.gdx:gdx:$gdxVersion"
-	//api "com.crashinvaders.lml:gdx-kiwi:1.9.1.10.0"
+	api "com.crashinvaders.lml:gdx-kiwi:1.10.1.11.0"
 	api "com.esotericsoftware.spine:spine-libgdx:$spineRuntimeVersion"
 	api "com.github.MrStahlfelge.gdx-websockets:core:$websocketVersion"
 	api "com.github.mgsx-dev.gdx-gltf:gltf:$gdxGltfVersion"
@@ -46,9 +46,9 @@ dependencies {
 	constraints {
 		implementation("org.apache.logging.log4j:log4j-core") {
 			version {
-				strictly("[2.16, 3[")
-				prefer("2.16.0")
-			}
+                strictly("[2.18, 3[")
+                prefer("2.18.0")
+            }
 			because("CVE-2021-44228: Log4j vulnerable to remote code execution")
 		}
 	}
