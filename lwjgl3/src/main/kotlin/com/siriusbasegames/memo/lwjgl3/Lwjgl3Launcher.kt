@@ -16,7 +16,7 @@ fun main() {
     Lwjgl3Application(MemoMain(), Lwjgl3ApplicationConfiguration().apply {
 
         setTitle(
-            "MEMO LibGDX ${properties.getProperty("appVersion")}"
+            "MEMO LibGDX ${properties.getProperty("gameVersion")}"
         )
         setResizable(false)
         setWindowedMode(1280, 720)
