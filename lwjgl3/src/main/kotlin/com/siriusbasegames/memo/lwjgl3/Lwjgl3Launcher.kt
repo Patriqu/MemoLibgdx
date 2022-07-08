@@ -14,7 +14,6 @@ fun main() {
     properties.load(FileInputStream("gradle.properties"))
 
     Lwjgl3Application(MemoMain(), Lwjgl3ApplicationConfiguration().apply {
-
         setTitle(
             "MEMO LibGDX ${properties.getProperty("gameVersion")}"
         )

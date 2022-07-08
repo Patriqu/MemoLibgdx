@@ -11,9 +11,13 @@ class Updater(private val gameStateHandler: GameStateHandler, private val guiDra
                 gameStateHandler.runGame()
             }
 
-            GameState.RUNNING -> {}
+            GameState.RUNNING -> {
+                return
+            }
 
-            GameState.LOSE -> {}
+            GameState.LOSE -> {
+                return
+            }
 
             GameState.LEVEL_COMPLETE -> {
                 guiDrawer.win()

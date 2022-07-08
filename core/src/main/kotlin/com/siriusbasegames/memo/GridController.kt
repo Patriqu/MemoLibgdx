@@ -88,19 +88,7 @@ class GridController(private val batch: Batch, private val gameStateHandler: Gam
                 val actualTileX = calculateDrawnCellX(cell, camera)
 
                 if (x >= actualTileX && x < actualTileX + cell.w && y > cell.y && y < cell.y + cell.h) {
-                    if (!cellsRevealed[i]) {
-                        cellsRevealed[i] = true
-                        logTileClicked(cell)
-
-                        ++nrRevealedCards
-
-                        val indices = ArrayList<Int>()
-                        if (isMatchedCards(indices)) {
-                            matchedCardsHandle(indices)
-                        }
-
-                        reverseCardsStep(indices)
-                    }
+                    handleClickedCard(i, cell)
 
                     break
                 }
@@ -110,12 +98,29 @@ class GridController(private val batch: Batch, private val gameStateHandler: Gam
         }
     }
 
+    private fun handleClickedCard(i: Int, cell: Grids.Tile) {
+        if (!cellsRevealed[i]) {
+            cellsRevealed[i] = true
+            logTileClicked(cell)
+
+            ++nrRevealedCards
+
+            val indices = ArrayList<Int>()
+            if (isMatchedCards(indices)) {
+                matchedCardsHandle(indices)
+            }
+
+            reverseCardsStep(indices)
+        }
+    }
+
     private fun calculateDrawnCellX(cell: Grids.Tile, camera: Camera): Float {
         return cell.x + camera.viewportWidth / 2 -
-                (grids.widthWithOffset() * grids.gridLayout(gameStateHandler.currentLevel())["columns"]!! /2)
+                (grids.widthWithOffset() * grids.gridLayout(gameStateHandler.currentLevel())["columns"]!! / 2)
     }
+
     private fun calculateDrawnCellY(cell: Grids.Tile, camera: Camera): Float {
-        return cell.y - (camera.viewportHeight/2 - grids.heightWithOffset()*2 - 0.2F)
+        return cell.y - (camera.viewportHeight / 2 - grids.heightWithOffset() * 2 - 0.2F)
     }
 
     private fun matchedCardsHandle(indices: ArrayList<Int>) {

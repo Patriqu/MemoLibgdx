@@ -1,3 +1,5 @@
+@file:JvmName("MemoMain")
+
 package com.siriusbasegames.memo
 
 import com.badlogic.gdx.Gdx
