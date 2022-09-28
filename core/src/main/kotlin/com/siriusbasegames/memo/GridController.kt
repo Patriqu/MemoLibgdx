@@ -2,7 +2,6 @@ package com.siriusbasegames.memo
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Gdx.files
-import com.badlogic.gdx.graphics.Camera
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.utils.Timer
@@ -66,26 +65,28 @@ class GridController(private val batch: Batch, private val gameStateHandler: Gam
         }
     }
 
-    fun draw(camera: Camera) {
-        if (cellCardMapping.isNotEmpty())
-        {
+    fun draw(bounds: List<Float>) {
+        if (cellCardMapping.isNotEmpty()) {
             for ((i, cell) in memoGrid.withIndex()) {
                 if (cellCardMapping[i] != -1) {
-                    batch.draw(if (cellsRevealed[i]) cardsTextures[cellCardMapping[i]] else reverseTexture,
-                        calculateDrawnCellX(cell, camera), calculateDrawnCellY(cell, camera), cell.w, cell.h)
+                    batch.draw(
+                        if (cellsRevealed[i]) cardsTextures[cellCardMapping[i]] else reverseTexture,
+                        calculateDrawnCellX(cell, bounds[0]), calculateDrawnCellY(cell, bounds[1]), cell.w,
+                        cell.h
+                    )
                 }
             }
         }
     }
 
-    fun revealCard(x: Float, y: Float, camera: Camera) {
+    fun revealCard(x: Float, y: Float, viewportWidth: Float) {
         if (nrRevealedCards < maxAllowedRevealedCards) {
             val it = memoGrid.listIterator()
             var i = 0
             while (it.hasNext()) {
                 val cell = it.next()
 
-                val actualTileX = calculateDrawnCellX(cell, camera)
+                val actualTileX = calculateDrawnCellX(cell, viewportWidth)
 
                 if (x >= actualTileX && x < actualTileX + cell.w && y > cell.y && y < cell.y + cell.h) {
                     handleClickedCard(i, cell)
@@ -114,20 +115,20 @@ class GridController(private val batch: Batch, private val gameStateHandler: Gam
         }
     }
 
-    private fun calculateDrawnCellX(cell: Grids.Tile, camera: Camera): Float {
-        return cell.x + camera.viewportWidth / 2 -
+    private fun calculateDrawnCellX(cell: Grids.Tile, viewPortWidth: Float): Float {
+        return cell.x + viewPortWidth / 2 -
                 (grids.widthWithOffset() * grids.gridLayout(gameStateHandler.currentLevel())["columns"]!! / 2)
     }
 
-    private fun calculateDrawnCellY(cell: Grids.Tile, camera: Camera): Float {
-        return cell.y - (camera.viewportHeight / 2 - grids.heightWithOffset() * 2 - 0.2F)
+    private fun calculateDrawnCellY(cell: Grids.Tile, viewportHeight: Float): Float {
+        return cell.y - (viewportHeight / 2 - grids.heightWithOffset() * 2 - 0.2F)
     }
 
     private fun matchedCardsHandle(indices: ArrayList<Int>) {
         Gdx.app.log("Matched", "Matched revealed cards")
 
         // destroy matched cards
-        Timer.schedule(object: Timer.Task() {
+        Timer.schedule(object : Timer.Task() {
             override fun run() {
                 destroyMatchedCards(indices)
 
