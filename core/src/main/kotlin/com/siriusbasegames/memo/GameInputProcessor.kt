@@ -54,7 +54,7 @@ class GameInputProcessor(private val gridController: GridController, private val
                 val x = worldPosition.x
                 val y = worldPosition.y
 
-                gridController.revealCard(x, y, camera)
+                gridController.revealCard(x, y, camera.viewportWidth)
             } else if (actualState == GameState.LEVEL_COMPLETE) {
                 gameStateHandler.setState(GameState.NEXT_LEVEL)
             } else if (actualState == GameState.LOSE || actualState == GameState.WIN) {

@@ -80,7 +80,8 @@ class MainScreen(gameStateHandler: GameStateHandler) : KtxScreen {
         batch.begin()
 
         batch.projectionMatrix = topdownCamera.combined
-        gridController.draw(topdownCamera)
+
+        gridController.draw(arrayListOf(topdownCamera.viewportWidth, topdownCamera.viewportHeight))
 
         batch.projectionMatrix = uiCamera.combined
         guiDrawer.draw(batch)
