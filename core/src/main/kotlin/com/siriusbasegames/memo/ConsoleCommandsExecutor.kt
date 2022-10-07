@@ -3,15 +3,19 @@ package com.siriusbasegames.memo;
 import com.strongjoshua.console.CommandExecutor
 
 class ConsoleCommandsExecutor(private val gameStateHandler: GameStateHandler) : CommandExecutor() {
-    fun levelComplete() {
-        gameStateHandler.setState(GameState.LEVEL_COMPLETE)
-    }
+    fun winLevel() = gameStateHandler.setState(GameState.LEVEL_COMPLETE)
 
-    fun nextLevel() {
+    fun nextLevel() = gameStateHandler.setState(GameState.NEXT_LEVEL)
+
+    fun loseLevel() = gameStateHandler.setState(GameState.LOSE)
+
+    fun resetLevel() {
+        gameStateHandler.setLevel(gameStateHandler.currentLevel() - 1)
         gameStateHandler.setState(GameState.NEXT_LEVEL)
+
     }
 
-    fun loadLevel(level: Int) {
+    fun loadlevel(level: Int) {
         gameStateHandler.setLevel(level - 1)
         gameStateHandler.setState(GameState.NEXT_LEVEL)
     }
