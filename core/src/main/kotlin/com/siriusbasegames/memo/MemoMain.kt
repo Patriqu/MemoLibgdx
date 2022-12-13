@@ -48,6 +48,8 @@ class MainScreen(gameStateHandler: GameStateHandler) : KtxScreen {
 
     private lateinit var console: Console
 
+    private val debugMode: DebugMode
+
     init {
         uiCamera.setToOrtho(false)
 
@@ -59,12 +61,13 @@ class MainScreen(gameStateHandler: GameStateHandler) : KtxScreen {
 
         updater = Updater(gameStateHandler, guiDrawer, gridController)
 
-        initConsole(gameStateHandler)
+        debugMode = DebugMode(gameStateHandler)
+        initConsole(debugMode)
     }
 
-    private fun initConsole(gameStateHandler: GameStateHandler) {
+    private fun initConsole(debugMode: DebugMode) {
         console = GUIConsole()
-        console.setCommandExecutor(ConsoleCommandsExecutor(gameStateHandler))
+        console.setCommandExecutor(ConsoleCommandsExecutor(debugMode))
         console.displayKeyID = Input.Keys.GRAVE
     }
 

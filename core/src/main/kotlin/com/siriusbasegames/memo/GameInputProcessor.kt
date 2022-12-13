@@ -11,17 +11,20 @@ class GameInputProcessor(private val gridController: GridController, private val
 
     override fun keyDown(keycode: Int): Boolean {
         if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
-            val actualState = gameStateHandler.getState()
-            if (actualState == GameState.LEVEL_COMPLETE) {
-                gameStateHandler.setState(GameState.NEXT_LEVEL)
-            } else if (actualState == GameState.LOSE || actualState == GameState.WIN) {
-                gameStateHandler.setState(GameState.RESET)
-            }
+            changeGameCompletionState()
         }
-
         debugKeys()
 
         return false
+    }
+
+    private fun changeGameCompletionState() {
+        val actualState = gameStateHandler.getState()
+        if (actualState == GameState.LEVEL_COMPLETE) {
+            gameStateHandler.setState(GameState.NEXT_LEVEL)
+        } else if (actualState == GameState.LOSE || actualState == GameState.WIN) {
+            gameStateHandler.setState(GameState.RESET)
+        }
     }
 
     private fun debugKeys() {
@@ -45,16 +48,7 @@ class GameInputProcessor(private val gridController: GridController, private val
         if (Gdx.input.isTouched(0)) {
             val actualState = gameStateHandler.getState()
             if (actualState == GameState.RUNNING) {
-                Gdx.app.log("Mouse", "LMB x=$screenX, y=$screenY")
-
-                val touchPosition = Vector3()
-                touchPosition[screenX.toFloat(), screenY.toFloat()] = 0f
-
-                val worldPosition = camera.unproject(touchPosition)
-                val x = worldPosition.x
-                val y = worldPosition.y
-
-                gridController.revealCard(x, y, camera.viewportWidth)
+                clickOnCard(screenX, screenY)
             } else if (actualState == GameState.LEVEL_COMPLETE) {
                 gameStateHandler.setState(GameState.NEXT_LEVEL)
             } else if (actualState == GameState.LOSE || actualState == GameState.WIN) {
@@ -63,6 +57,18 @@ class GameInputProcessor(private val gridController: GridController, private val
         }
 
         return false
+    }
+    private fun clickOnCard(screenX: Int, screenY: Int) {
+        Gdx.app.log("Mouse", "LMB x=$screenX, y=$screenY")
+
+        val touchPosition = Vector3()
+        touchPosition[screenX.toFloat(), screenY.toFloat()] = 0f
+
+        val worldPosition = camera.unproject(touchPosition)
+        val x = worldPosition.x
+        val y = worldPosition.y
+
+        gridController.revealCard(x, y, camera.viewportWidth)
     }
 
     override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
