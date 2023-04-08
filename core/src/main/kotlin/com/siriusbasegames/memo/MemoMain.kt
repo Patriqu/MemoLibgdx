@@ -5,6 +5,7 @@ package com.siriusbasegames.memo
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Gdx.input
 import com.badlogic.gdx.Input
+import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
@@ -42,6 +43,8 @@ class MainScreen(gameStateHandler: GameStateHandler) : KtxScreen {
 
     private val disposer: Disposer
 
+    private val inputMultiplexer: InputMultiplexer
+
     private val guiDrawer: GuiDrawer = GuiDrawer(gameStateHandler)
 
     private val updater: Updater
@@ -57,7 +60,10 @@ class MainScreen(gameStateHandler: GameStateHandler) : KtxScreen {
 
         disposer = Disposer(batch, gridController, guiDrawer)
 
-        input.inputProcessor = GameInputProcessor(gridController, topdownCamera, gameStateHandler)
+        inputMultiplexer = InputMultiplexer()
+        inputMultiplexer.addProcessor(DebugInputProcessor(gameStateHandler))
+        inputMultiplexer.addProcessor(GameInputProcessor(gridController, topdownCamera, gameStateHandler))
+        input.inputProcessor = inputMultiplexer
 
         updater = Updater(gameStateHandler, guiDrawer, gridController)
 

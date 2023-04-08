@@ -46,10 +46,6 @@ class GridController(private val batch: Batch, private val gameStateHandler: Gam
         remainingCards = grids.cellsAmount(1)!!
     }
 
-    fun enterTheBreakpoint() {
-        return
-    }
-
     private fun loadCards() {
         var cardFiles = files.internal(cardsDir).list()     // Android
         if (cardFiles.isEmpty()) {

@@ -10,10 +10,9 @@ class GameInputProcessor(private val gridController: GridController, private val
     GameStateHandler) : InputProcessor {
 
     override fun keyDown(keycode: Int): Boolean {
-        if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
+        if (keycode == Input.Keys.ENTER) {
             changeGameCompletionState()
         }
-        debugKeys()
 
         return false
     }
@@ -24,15 +23,6 @@ class GameInputProcessor(private val gridController: GridController, private val
             gameStateHandler.setState(GameState.NEXT_LEVEL)
         } else if (actualState == GameState.LOSE || actualState == GameState.WIN) {
             gameStateHandler.setState(GameState.RESET)
-        }
-    }
-
-    private fun debugKeys() {
-        if (Gdx.input.isKeyJustPressed(Input.Keys.D)) {
-            gridController.enterTheBreakpoint()
-        }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.NUM_0)) {
-            gameStateHandler.setState(GameState.LEVEL_COMPLETE)
         }
     }
 
