@@ -19,7 +19,10 @@ permissions:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+        matrix:
+            os: [windows-latest, macOS-latest, ubuntu-latest]
     steps:
     - uses: actions/checkout@v3
     - name: Set up JDK 17
@@ -29,10 +32,10 @@ jobs:
         distribution: 'temurin'
     - name: Validate Gradle wrapper
       uses: gradle/wrapper-validation-action@ccb4328a959376b642e027874838f60f8e596de3
-    - name: Build with Gradle
+    - name: Build & Package with Gradle
       uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
       with:
-        arguments: build
+        arguments: packageRelease
     - name: Upload artifact
       uses: actions/upload-artifact@v3
       with:
