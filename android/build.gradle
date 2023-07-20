@@ -17,8 +17,10 @@ android {
 	}
 	packagingOptions {
 		resources {
-			excludes += ['META-INF/robovm/ios/robovm.xml', 'META-INF/DEPENDENCIES.txt', 'META-INF/DEPENDENCIES', 'META-INF/dependencies.txt']
-			pickFirsts += ['META-INF/LICENSE.txt', 'META-INF/LICENSE', 'META-INF/license.txt', 'META-INF/LGPL2.1', 'META-INF/NOTICE.txt', 'META-INF/NOTICE', 'META-INF/notice.txt']
+			excludes += ['META-INF/robovm/ios/robovm.xml', 'META-INF/DEPENDENCIES.txt', 'META-INF/DEPENDENCIES',
+						 'META-INF/dependencies.txt']
+			pickFirsts += ['META-INF/LICENSE.txt', 'META-INF/LICENSE', 'META-INF/license.txt', 'META-INF/LGPL2.1',
+						   'META-INF/NOTICE.txt', 'META-INF/NOTICE', 'META-INF/notice.txt']
 		}
 	}
 	defaultConfig {
@@ -27,18 +29,13 @@ android {
 		minSdkVersion 24
 		targetSdkVersion 33
 		versionCode 1
-		versionName "1.0"
+		versionName "0.2.3.11"
 		multiDexEnabled true
 	}
 	compileOptions {
 		sourceCompatibility JavaVersion.VERSION_17
 		targetCompatibility JavaVersion.VERSION_17
 		coreLibraryDesugaringEnabled true
-	}
-	kotlinOptions {
-		jvmTarget = "$jvmTargetVersion"
-		languageVersion = "$kotlinLanguageVersion"
-		freeCompilerArgs = ["-Xuse-k2", "-Xallow-unstable-dependencies"]
 	}
 	buildTypes {
 		release {

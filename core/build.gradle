@@ -43,8 +43,8 @@ dependencies {
 	api "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
 	api "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxCoroutinesVersion"
 
-	testImplementation "org.mockito:mockito-bom:4.8.1"
-	testImplementation "org.mockito.kotlin:mockito-kotlin:$mockitoVersion"
+	testImplementation "org.mockito:mockito-bom:$mockitoVersion"
+	testImplementation "org.mockito.kotlin:mockito-kotlin:$mockitoKotlinVersion"
 
 	testImplementation "org.jetbrains.kotlin:kotlin-test"
 

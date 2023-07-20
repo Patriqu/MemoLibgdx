@@ -43,7 +43,7 @@ configure(subprojects - project(':android')) {
 		kotlinOptions {
 			jvmTarget = "$jvmTargetVersion"
 			languageVersion = "$kotlinLanguageVersion"
-			freeCompilerArgs = ["-Xuse-k2", "-Xallow-unstable-dependencies"]
+			freeCompilerArgs = ["-Xallow-unstable-dependencies"]
 			incremental = true
 		}
 	}
@@ -51,12 +51,9 @@ configure(subprojects - project(':android')) {
 		kotlinOptions {
 			jvmTarget = "$jvmTargetVersion"
 			languageVersion = "$kotlinLanguageVersion"
-			freeCompilerArgs = ["-Xuse-k2", "-Xallow-unstable-dependencies"]
+			freeCompilerArgs = ["-Xallow-unstable-dependencies"]
 			incremental = true
 		}
-	}
-	test {
-		useJUnitPlatform()
 	}
 }
 
