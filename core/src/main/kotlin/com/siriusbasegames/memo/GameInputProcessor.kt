@@ -36,13 +36,17 @@ class GameInputProcessor(private val gridController: GridController, private val
 
     override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
         if (Gdx.input.isTouched(0)) {
-            val actualState = gameStateHandler.getState()
-            if (actualState == GameState.RUNNING) {
-                clickOnCard(screenX, screenY)
-            } else if (actualState == GameState.LEVEL_COMPLETE) {
-                gameStateHandler.setState(GameState.NEXT_LEVEL)
-            } else if (actualState == GameState.LOSE || actualState == GameState.WIN) {
-                gameStateHandler.setState(GameState.RESET)
+            when (val actualState = gameStateHandler.getState()) {
+                GameState.RUNNING -> {
+                    clickOnCard(screenX, screenY)
+                }
+                GameState.LEVEL_COMPLETE -> {
+                    gameStateHandler.setState(GameState.NEXT_LEVEL)
+                }
+                GameState.LOSE, GameState.WIN -> {
+                    gameStateHandler.setState(GameState.RESET)
+                }
+                else -> error("Invalid Game State $actualState")
             }
         }
 

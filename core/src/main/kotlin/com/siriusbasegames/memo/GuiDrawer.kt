@@ -10,7 +10,7 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.utils.Timer
 import ktx.graphics.center
 
-class GuiDrawer(gameStateHandler: GameStateHandler) {
+class GuiDrawer(private var gameStateHandler: GameStateHandler) {
     private var textFontGenerator: FreeTypeFontGenerator?
     private var fontGeneratorParameter: FreeTypeFontGenerator.FreeTypeFontParameter = FreeTypeFontGenerator
         .FreeTypeFontParameter()
@@ -19,19 +19,20 @@ class GuiDrawer(gameStateHandler: GameStateHandler) {
     private val fontsDir = "fonts/"
 
     // game complete texts
-    private var completeTexts: MutableMap<String, MutableMap<String, String>>
-            = mutableMapOf(
-        "levelComplete" to mutableMapOf("primary" to "LEVEL COMPLETE!", "secondary" to "Click to go to the next level"),
-        "win" to mutableMapOf("primary" to "YOU WIN!", "secondary" to "Click to restart the game"),
-        "lose" to mutableMapOf("primary" to "YOU LOSE!", "secondary" to "Click to restart the game")
+    private var completeTexts: Map<String, Map<String, String>>
+            = mapOf(
+        "levelComplete" to mapOf("primary" to "LEVEL COMPLETE!", "secondary" to "Click to go to the next level"),
+        "win" to mapOf("primary" to "YOU WIN!", "secondary" to "Click to restart the game"),
+        "lose" to mapOf("primary" to "YOU LOSE!", "secondary" to "Click to restart the game")
     )
-    private var completeCoordinates: MutableMap<String, MutableMap<String, MutableMap<String, Float>>>
-            = mutableMapOf(
-        "levelComplete" to mutableMapOf("X" to mutableMapOf("primary" to 0F, "secondary" to 0F),
+
+    private var completeCoordinates: Map<String, Map<String, MutableMap<String, Float>>>
+            = mapOf(
+        "levelComplete" to mapOf("X" to mutableMapOf("primary" to 0F, "secondary" to 0F),
             "Y" to mutableMapOf("primary" to 0F, "secondary" to 0F)),
-        "win" to mutableMapOf("X" to mutableMapOf("primary" to 0F, "secondary" to 0F),
+        "win" to mapOf("X" to mutableMapOf("primary" to 0F, "secondary" to 0F),
             "Y" to mutableMapOf("primary" to 0F, "secondary" to 0F)),
-        "lose" to mutableMapOf("X" to mutableMapOf("primary" to 0F, "secondary" to 0F),
+        "lose" to mapOf("X" to mutableMapOf("primary" to 0F, "secondary" to 0F),
             "Y" to mutableMapOf("primary" to 0F, "secondary" to 0F)))
 
     private val textTypes: List<String> = listOf("primary", "secondary")
@@ -53,11 +54,7 @@ class GuiDrawer(gameStateHandler: GameStateHandler) {
     private var countdown = countdownMax
     private var countdownTask: Timer.Task
 
-    private var gameStateHandler: GameStateHandler
-
     init {
-        this.gameStateHandler = gameStateHandler
-
         // font type generator initialization
         var file = Gdx.files.internal(assetsDir + fontsDir + fontType)     // Android
         if (file != null) {
@@ -100,8 +97,11 @@ class GuiDrawer(gameStateHandler: GameStateHandler) {
             val a = completeText.value
 
             for (type in textTypes) {
-                val coordsPrimary = completeFonts[type]?.center(a[type]!!, graphics.width.toFloat(), graphics
-                    .height.toFloat(), 0f, 0f)
+                val coordsPrimary = a[type]?.let {
+                    completeFonts[type]?.center(
+                        it, graphics.width.toFloat(), graphics
+                            .height.toFloat(), 0f, 0f)
+                }
 
                 if (coordsPrimary != null) {
                     completeCoordinates[completeText.key]?.get("X")?.set(type, coordsPrimary.x)
@@ -150,21 +150,30 @@ class GuiDrawer(gameStateHandler: GameStateHandler) {
     }
 
     private fun drawCompleteText(batch: Batch) {
-        val gameState = gameStateHandler.getState()
-        if (gameState == GameState.LEVEL_COMPLETE) {
-            drawCompleteText(batch, "levelComplete")
-        } else if (gameState == GameState.WIN) {
-            drawCompleteText(batch, "win")
-        } else if (gameStateHandler.getState() == GameState.LOSE) {
-            drawCompleteText(batch, "lose")
+        when (gameStateHandler.getState()) {
+            GameState.LEVEL_COMPLETE -> drawCompleteText(batch, "levelComplete")
+            GameState.WIN -> drawCompleteText(batch, "win")
+            GameState.LOSE -> drawCompleteText(batch, "lose")
+            else -> Unit
         }
     }
 
     private fun drawCompleteText(batch: Batch, key: String) {
-        completeFonts["primary"]?.draw(batch, completeTexts[key]!!["primary"],
-            completeCoordinates[key]!!["X"]!!["primary"]!!, completeCoordinates[key]!!["Y"]!!["primary"]!!)
-        completeFonts["secondary"]?.draw(batch, completeTexts[key]!!["secondary"],
-            completeCoordinates[key]!!["X"]!!["secondary"]!!, completeCoordinates[key]!!["Y"]!!["secondary"]!!)
+        completeCoordinates[key]?.get("X")?.get("primary")?.let {
+            completeCoordinates[key]?.get("Y")?.get("primary")?.let { it1 ->
+                completeFonts["primary"]?.draw(batch, completeTexts[key]?.get("primary") ?: "",
+                    it, it1
+                )
+            }
+        }
+
+        completeCoordinates[key]?.get("X")?.get("secondary")?.let {
+            completeCoordinates[key]?.get("Y")?.get("secondary")?.let { it1 ->
+                completeFonts["secondary"]?.draw(batch, completeTexts[key]?.get("secondary") ?: "",
+                    it, it1
+                )
+            }
+        }
     }
 
     fun dispose() {
