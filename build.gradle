@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 buildscript {
 	repositories {
 		mavenCentral()
@@ -39,19 +41,12 @@ configure(subprojects - project(':android')) {
 	compileJava {
 		options.incremental = true
 	}
-	compileKotlin {
+
+	tasks.withType(KotlinCompile).configureEach {
 		kotlinOptions {
+			//languageVersion = "$kotlinLanguageVersion"
 			jvmTarget = "$jvmTargetVersion"
-			languageVersion = "$kotlinLanguageVersion"
-			freeCompilerArgs = ["-Xallow-unstable-dependencies"]
-			incremental = true
-		}
-	}
-	compileTestKotlin {
-		kotlinOptions {
-			jvmTarget = "$jvmTargetVersion"
-			languageVersion = "$kotlinLanguageVersion"
-			freeCompilerArgs = ["-Xallow-unstable-dependencies"]
+			freeCompilerArgs += "-Xallow-unstable-dependencies"
 			incremental = true
 		}
 	}
