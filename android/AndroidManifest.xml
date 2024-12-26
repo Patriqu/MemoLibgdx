@@ -7,15 +7,16 @@
 			android:required="true"/>
 	<uses-permission android:name="android.permission.INTERNET"/>
 	<application
-			android:allowBackup="false"
-			android:fullBackupContent="false"
-			android:usesCleartextTraffic="false"
-			android:icon="@drawable/ic_launcher"
-			android:isGame="true"
-			android:appCategory="game"
-			android:label="@string/app_name"
-			tools:ignore="UnusedAttribute"
-			android:theme="@style/GdxTheme">
+		android:allowBackup="false"
+		android:fullBackupContent="false"
+		android:dataExtractionRules="@xml/data_extraction_rules"
+		android:usesCleartextTraffic="false"
+		android:icon="@drawable/ic_launcher"
+		android:isGame="true"
+		android:appCategory="game"
+		android:label="@string/app_name"
+		tools:ignore="UnusedAttribute"
+		android:theme="@style/GdxTheme">
 		<activity
 				android:name="com.siriusbasegames.memo.android.AndroidLauncher"
 				android:screenOrientation="landscape"
